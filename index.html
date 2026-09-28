@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Hengzhun Design · 交互原型</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="script-library.css">
+</head>
+<body>
+  <!--
+    Assumptions:
+    - The supplied 1920×1128 screenshot is the visual source of truth.
+    - This is a local interaction prototype; no model or membership API is connected.
+    - The logo and artwork are original approximations so the file has no remote asset dependency.
+  -->
+  <div class="app-shell">
+    <aside class="sidebar" data-testid="sidebar">
+      <div class="brand-row">
+        <button class="brand" type="button" data-action="home" aria-label="Hengzhun Design 首页">
+          <img class="brand-icon brand-icon--small" src="assets/hengzhun-smart-design-icon.png" alt="">
+          <strong>Hengzhun Design</strong>
+        </button>
+        <div class="brand-actions">
+          <button class="icon-button collapse-trigger" type="button" data-action="collapse" aria-label="收起侧边栏"><span></span></button>
+          <button class="icon-button search-trigger" type="button" data-action="search" data-testid="search-trigger" data-dropdown-boundary aria-label="搜索" aria-expanded="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.8"></circle><path d="m15.7 15.7 5 5"></path></svg>
+          </button>
+        </div>
+      </div>
+      <button class="icon-button sidebar-expand-trigger" type="button" data-action="collapse" aria-label="展开侧边栏" title="展开侧边栏"><span></span></button>
+
+      <div class="search-panel" data-testid="search-panel" data-dropdown-boundary hidden>
+        <div class="search-input-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.8"></circle><path d="m15.7 15.7 5 5"></path></svg>
+          <input data-testid="search-input" type="search" role="combobox" placeholder="搜索全站内容" aria-label="搜索全站内容" aria-autocomplete="list" aria-controls="global-search-results" aria-expanded="false" aria-activedescendant="" autocomplete="off">
+        </div>
+        <div class="global-search-results" id="global-search-results" data-testid="global-search-results" role="listbox" aria-label="全站搜索结果" hidden></div>
+        <p class="global-search-empty" data-testid="global-search-empty" role="status" hidden>未找到相关内容</p>
+      </div>
+
+      <nav class="primary-nav" aria-label="主要导航">
+        <div class="create-nav-entry">
+          <button class="nav-item active" type="button" data-nav="create" data-testid="nav-create" aria-haspopup="menu">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>开始创作</span>
+          </button>
+          <aside class="creation-tools-flyout" data-testid="creation-tools-flyout" aria-label="创作工具快捷入口">
+            <div class="creation-flyout-panels">
+              <section class="flyout-tool-group" data-flyout-panel="generation" aria-labelledby="generation-tools-title">
+                <h2 id="generation-tools-title">素材生成</h2>
+                <div class="flyout-tool-grid">
+                  <button type="button" data-tool="图像生成" aria-label="图像生成"><span class="flyout-tool-icon flyout-tool-icon--image" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="3"/><circle cx="9" cy="9" r="1.7"/><path d="m5.5 17 4.4-4.3 3.1 3 2.1-2 3.4 3.3"/><path d="M17.5 2.5v4M15.5 4.5h4"/></svg></span><strong>图像生成</strong></button>
+                  <button type="button" data-tool="音频克隆" aria-label="音频克隆"><span class="flyout-tool-icon flyout-tool-icon--audio" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 10v4M8.5 7v10M12 4.5v15M15.5 7v10M19 10v4"/><path d="m16.5 4.2.8 1.7 1.7.8-1.7.8-.8 1.7-.8-1.7-1.7-.8 1.7-.8.8-1.7Z"/></svg></span><strong>音频克隆</strong></button>
+                  <button type="button" data-tool="数字人生成" aria-label="数字人生成" hidden><span class="flyout-tool-icon flyout-tool-icon--digital-human" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M6.5 19a5.5 5.5 0 0 1 11 0M18.5 5.5v4M16.5 7.5h4"/></svg></span><span class="flyout-tool-title"><strong>数字人生成</strong><small>暂未上线</small></span></button>
+                </div>
+              </section>
+              <section class="flyout-tool-group" data-flyout-panel="acquisition" aria-labelledby="acquisition-tools-title">
+                <h2 id="acquisition-tools-title">素材获取</h2>
+                <div class="flyout-tool-grid">
+                  <button type="button" data-tool="文案提取" aria-label="文案提取"><span class="flyout-tool-icon flyout-tool-icon--copy" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3.5h9l3 3V20H6z"/><path d="M14.5 3.5V7H18M9 11h6M9 15h5"/><path d="m3.5 10.5-1 2 1 2M20.5 10.5l1 2-1 2"/></svg></span><strong>文案提取</strong></button>
+                </div>
+              </section>
+              <section class="flyout-tool-group" data-flyout-panel="video" aria-labelledby="video-tools-title" hidden>
+                <h2 id="video-tools-title">视频创作</h2>
+                <div class="flyout-tool-grid flyout-video-grid">
+                  <button type="button" data-tool="素材成片" aria-label="素材成片"><span class="flyout-tool-icon flyout-tool-icon--video flyout-tool-icon--video-compose" aria-hidden="true"><svg data-icon="video-compose" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M7 5v14M17 5v14M10 9l4.5 3-4.5 3Z"/></svg></span><strong>素材成片</strong></button>
+                  <button type="button" data-tool="口播视频剪辑" aria-label="口播视频剪辑"><span class="flyout-tool-icon flyout-tool-icon--video flyout-tool-icon--talking-edit" aria-hidden="true"><svg data-icon="talking-video-edit" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="14" height="11" rx="2"/><path d="M8 8l4 2.25L8 12.5Z"/><circle cx="17.5" cy="17" r="1.5"/><circle cx="20.5" cy="20" r="1.5"/><path d="m18.6 18.1 2.8-2.8M19.4 18.9l-3.2 3.2"/></svg></span><strong>口播视频剪辑</strong></button>
+                  <button type="button" data-tool="AI音乐" aria-label="AI音乐"><span class="flyout-tool-icon flyout-tool-icon--video flyout-tool-icon--ai-music" aria-hidden="true"><svg data-icon="ai-music" viewBox="0 0 24 24"><path d="M8.5 17.5V7l8-1.5v10.2M8.5 10l8-1.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="14" cy="16.2" r="2.5"/><path d="m19 4 .6 1.4 1.4.6-1.4.6L19 7l-.6-1.4L17 5l1.4-.6Z"/></svg></span><strong>AI音乐</strong></button>
+                  <button type="button" data-tool="AI视频" aria-label="AI视频"><span class="flyout-tool-icon flyout-tool-icon--video flyout-tool-icon--ai-video" aria-hidden="true"><svg data-icon="ai-video" viewBox="0 0 24 24"><rect x="3.5" y="5" width="16" height="14" rx="2.5"/><path d="m9.5 9 5 3-5 3Z"/><path d="m19 3 .55 1.25L21 4.8l-1.45.55L19 6.7l-.55-1.35L17 4.8l1.45-.55Z"/></svg></span><strong>AI视频</strong></button>
+                  <button type="button" data-tool="视频拆条" aria-label="视频拆条"><span class="flyout-tool-icon flyout-tool-icon--video flyout-tool-icon--video-split" aria-hidden="true"><svg data-icon="video-split" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="6" rx="1.5"/><rect x="3.5" y="14" width="17" height="6" rx="1.5"/><path d="M8 7h4M8 17h4M14.5 7H17M14.5 17H17M12 11.5v1"/></svg></span><strong>视频拆条</strong></button>
+                  <button type="button" data-tool="形象库" aria-label="形象库"><span class="flyout-tool-icon flyout-tool-icon--video flyout-tool-icon--avatar-library" aria-hidden="true"><svg data-icon="avatar-library" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><circle cx="10" cy="9" r="2.5"/><path d="M6.5 16a3.5 3.5 0 0 1 7 0M16 8h1.5M16 11h1.5M16 14h1.5"/></svg></span><strong>形象库</strong></button>
+                </div>
+              </section>
+            </div>
+          </aside>
+        </div>
+        <button class="nav-item" type="button" data-nav="projects" data-testid="nav-projects">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h6l2-2h4.8a2 2 0 0 1 2 2v1M4.5 8.5h15a1.5 1.5 0 0 1 1.45 1.88l-2 7.5A2.2 2.2 0 0 1 16.82 19.5H4.7a2 2 0 0 1-2-2.2l.6-7.45A1.5 1.5 0 0 1 4.5 8.5Z"/></svg><span>项目·素材</span>
+        </button>
+        <button class="nav-item" type="button" data-nav="skills" data-testid="nav-skills">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3.5v3.5M15 3.5v3.5M9 17v3.5M15 17v3.5M3.5 9H7M17 9h3.5M3.5 15H7M17 15h3.5"/></svg><span>技能</span>
+        </button>
+        <div class="resource-nav-group" data-testid="resource-nav-group">
+          <div class="resource-nav-heading">
+            <button class="nav-item resource-nav-parent" type="button" data-nav="knowledge" data-testid="nav-knowledge">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h10.5A2.5 2.5 0 0 1 18 7v12.5H7.5A2.5 2.5 0 0 1 5 17V4.5Z"/><path d="M8 8h7M8 12h7M8 16h5M18 7h1a1 1 0 0 1 1 1v13H8"/></svg><span>知识库</span>
+            </button>
+            <button class="resource-nav-toggle" type="button" data-action="toggle-resource-nav" data-testid="resource-nav-toggle" aria-label="收起知识库子菜单" aria-controls="resource-nav-children" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          </div>
+          <div class="resource-nav-children" id="resource-nav-children" data-testid="resource-nav-children">
+            <button class="nav-item resource-nav-child" type="button" data-nav="knowledge" data-testid="nav-resource-documents"><span>资料库</span></button>
+            <button class="nav-item resource-nav-child" type="button" data-nav="scripts" data-testid="nav-script-library"><span>脚本库</span></button>
+          </div>
+        </div>
+        <button class="nav-item" type="button" data-nav="scheduled-tasks" data-testid="nav-scheduled-tasks">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2M8 3.5 6 5M16 3.5 18 5"/></svg><span>定时任务</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section-divider" data-testid="sidebar-section-divider" aria-hidden="true"></div>
+
+      <section class="project-tree" aria-labelledby="projects-label">
+        <section class="sidebar-pinned-section" data-testid="sidebar-pinned-section" aria-labelledby="sidebar-pinned-label" hidden>
+          <p class="sidebar-pinned-label" id="sidebar-pinned-label">置顶</p>
+          <div class="sidebar-pinned-list" data-sidebar-pinned-list></div>
+        </section>
+        <div class="tree-heading-row">
+          <button class="tree-heading" type="button" data-action="toggle-projects" aria-expanded="true">
+            <span id="projects-label">个人项目</span><i></i>
+          </button>
+          <div class="tree-heading-actions">
+            <button class="tree-heading-icon tree-heading-more" type="button" data-action="sidebar-project-filter" data-testid="sidebar-project-filter-trigger" data-dropdown-boundary aria-label="项目筛选" aria-haspopup="menu" aria-expanded="false">•••</button>
+            <button class="tree-heading-icon tree-heading-add" type="button" data-project-type="personal" data-testid="sidebar-new-project-trigger" aria-label="新建项目">＋</button>
+            <div class="sidebar-project-filter-menu" data-panel="sidebar-project-filter" data-testid="sidebar-project-filter-menu" data-dropdown-boundary role="menu" hidden>
+              <p>分组方式</p>
+              <button type="button" role="menuitemradio" aria-checked="true" data-sidebar-project-group="project"><span>按项目</span><i>✓</i></button>
+              <button type="button" role="menuitemradio" aria-checked="false" data-sidebar-project-group="none"><span>不分组</span><i>✓</i></button>
+              <hr>
+              <p>排序方式</p>
+              <button type="button" role="menuitemradio" aria-checked="true" data-sidebar-project-sort="manual"><span>手动排序</span><i>✓</i></button>
+              <button type="button" role="menuitemradio" aria-checked="false" data-sidebar-project-sort="recent"><span>最近打开</span><i>✓</i></button>
+              <button type="button" role="menuitemradio" aria-checked="false" data-sidebar-project-sort="unread"><span>优先未读</span><i>✓</i></button>
+            </div>
+          </div>
+        </div>
+        <div class="tree-children" data-sidebar-project-list>
+          <button class="tree-row tree-row--project" type="button" draggable="true" data-sidebar-project data-project-id="project-guide" data-project-name="项目新手指引" aria-expanded="true" title="项目新手指引">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h6l2-2h4.8a2 2 0 0 1 2 2v1M4.5 8.5h15a1.5 1.5 0 0 1 1.45 1.88l-2 7.5A2.2 2.2 0 0 1 16.82 19.5H4.7a2 2 0 0 1-2-2.2l.6-7.45A1.5 1.5 0 0 1 4.5 8.5Z"/></svg><span class="tree-project-name" title="项目新手指引">项目新手指引</span><span class="sidebar-project-controls" data-sidebar-project-control data-dropdown-boundary><span class="sidebar-project-more" data-action="toggle-sidebar-project-menu" role="button" tabindex="0" aria-label="项目新手指引 的项目操作" aria-haspopup="menu" aria-expanded="false">•••</span><span class="sidebar-project-new-conversation" data-action="new-project-conversation" role="button" tabindex="0" aria-label="在项目新手指引中创建对话" title="在项目内创建对话"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6.5M14.5 4.5l5 5M12 12l2.2-.5 5.3-5.3-1.7-1.7-5.3 5.3L12 12Z"/></svg></span></span><span class="sidebar-project-pin" data-action="toggle-project-pin" data-sidebar-project-control role="button" tabindex="0" aria-label="置顶项目 项目新手指引" title="置顶"><svg data-icon="pushpin" viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 4 5.5 5.5-3.2 1.1-4.2 4.2-.7 3.7-3.2-3.2-3.2-3.2 3.7-.7 4.2-4.2L14.5 4Z"/><path d="m9.2 15.3-5.2 5.2"/></svg></span>
+          </button>
+          <button class="tree-row tree-row--indented tree-row--conversation" type="button" data-parent-project-id="project-guide" data-sidebar-conversation data-project-id="project-guide" data-conversation-id="guide-conversation" data-status="complete" aria-label="查看项目使用指南" title="查看项目使用指南">
+            <span class="conversation-mark" aria-hidden="true"></span>
+            <span class="conversation-status" data-conversation-status><span class="conversation-spinner" data-conversation-spinner hidden aria-hidden="true"></span><span class="conversation-unread-dot" data-conversation-unread hidden aria-label="未读"></span></span>
+            <span class="conversation-pin-control" data-action="toggle-conversation-pin" data-conversation-pin role="button" tabindex="0" aria-label="置顶对话" title="置顶"><svg data-icon="pushpin" viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 4 5.5 5.5-3.2 1.1-4.2 4.2-.7 3.7-3.2-3.2-3.2-3.2 3.7-.7 4.2-4.2L14.5 4Z"/><path d="m9.2 15.3-5.2 5.2"/></svg></span>
+            <span class="conversation-title" title="查看项目使用指南">查看项目使用指南</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="sidebar-project-action-menu" data-testid="sidebar-project-action-menu" data-dropdown-boundary hidden role="menu" aria-label="项目操作">
+        <button type="button" role="menuitem" data-action="rename-sidebar-project">重命名</button>
+        <hr>
+        <button class="danger" type="button" role="menuitem" data-action="open-project-delete">删除项目</button>
+      </div>
+
+      <div class="account-row" data-testid="account-row" data-dropdown-boundary>
+        <div class="account-summary" data-testid="account-summary">
+          <span class="account-avatar" aria-hidden="true">✦</span>
+          <span class="account-identity">
+            <strong class="account-name" data-testid="account-name">Veki</strong>
+            <small class="account-role" data-testid="account-role">产品经理，中科闻歌</small>
+          </span>
+        </div>
+        <button class="account-more" type="button" data-action="account" data-testid="account-more" aria-label="打开通知" aria-haspopup="dialog" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="12" cy="19" r="1.7"></circle></svg>
+          <span class="account-unread-dot" data-testid="account-unread-dot" aria-label="有未读通知"></span>
+        </button>
+      </div>
+      <aside class="account-notification-panel" data-panel="account" data-testid="account-notification-panel" data-dropdown-boundary hidden role="dialog" aria-label="通知">
+        <header class="notification-panel-header">
+          <div class="notification-panel-title">
+            <strong>通知</strong>
+            <span data-testid="notification-unread-count"></span>
+          </div>
+          <div class="notification-panel-actions">
+            <button class="notification-mark-all-read" type="button" data-action="mark-all-notifications-read" data-testid="notification-mark-all-read">全部已读</button>
+            <button class="notification-panel-close" type="button" data-action="close-account-notifications" aria-label="关闭通知">×</button>
+          </div>
+        </header>
+        <label class="notification-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+          <input type="search" data-testid="notification-search" placeholder="搜索通知" autocomplete="off">
+        </label>
+        <div class="notification-filters" role="tablist" aria-label="通知筛选">
+          <button type="button" data-notification-filter="unread" role="tab" aria-selected="true">未读</button>
+          <button type="button" data-notification-filter="all" role="tab" aria-selected="false">全部</button>
+        </div>
+        <div class="notification-list" data-testid="notification-list"></div>
+        <div class="notification-empty" data-testid="notification-empty" hidden>暂无未读通知</div>
+        <footer class="notification-panel-footer">
+          <button type="button" data-action="logout-account">退出登录</button>
+        </footer>
+      </aside>
+      <aside class="account-login-panel" data-panel="account-login" data-testid="account-login-panel" data-dropdown-boundary hidden role="dialog" aria-label="登录账号">
+        <header class="account-login-header">
+          <strong>登录账号</strong>
+          <button type="button" data-action="close-account-login" aria-label="关闭登录账号">×</button>
+        </header>
+        <div class="account-login-list" data-account-login-list></div>
+      </aside>
+    </aside>
+
+    <aside class="conversation-hover-card" data-testid="conversation-hover-card" hidden aria-live="polite">
+      <div class="conversation-hover-card__heading">
+        <strong data-conversation-hover-title></strong>
+        <time data-conversation-hover-time></time>
+      </div>
+      <p data-conversation-hover-prompt></p>
+    </aside>
+
+    <main class="workspace">
+      <section class="canvas" aria-label="Hengzhun Design 创作工作区">
+        <div class="workspace-view home-view" data-view="create" data-testid="home-view">
+        <div class="hero-wrap">
+          <div class="hero-brand">
+            <img class="brand-icon brand-icon--hero" src="assets/hengzhun-smart-design-icon.png" alt="">
+            <h1>Hengzhun Design</h1>
+          </div>
+          <p class="tagline">属于你的多模态Agent团队</p>
+        </div>
+
+        <section class="creation-stage" aria-label="创作输入">
+          <div class="composer" data-testid="composer">
+            <div class="composer-input-row">
+              <div class="composer-modules" data-testid="home-selected-modules" aria-label="已选功能模块" hidden></div>
+              <div class="composer-references" data-testid="home-selected-references" aria-label="已选素材与连接器" hidden></div>
+              <textarea data-testid="prompt-input" data-command-input aria-label="创作内容" aria-haspopup="listbox" aria-expanded="false" aria-controls="composer-command-menu" placeholder="输入想创作的内容，用 @ 选择素材，用 / 使用技能。"></textarea>
+            </div>
+            <div class="composer-toolbar">
+              <div class="toolbar-left">
+                <button class="round-add" type="button" data-action="add" data-dropdown-boundary aria-label="添加素材" aria-expanded="false"><span></span></button>
+                <button class="tool-button" type="button" data-action="model" data-testid="model-trigger" data-dropdown-boundary aria-expanded="false">
+                  <svg class="functional-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.4 7.7 7.6 4.4 7.6-4.4M12 12.1V21"/></svg><span>模型</span>
+                </button>
+                <i class="toolbar-divider"></i>
+                <button class="tool-button" type="button" data-action="skill" data-testid="skill-trigger" data-dropdown-boundary aria-expanded="false">
+                  <svg class="functional-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3.5v3.5M15 3.5v3.5M9 17v3.5M15 17v3.5M3.5 9H7M17 9h3.5M3.5 15H7M17 15h3.5"/></svg><span>技能</span>
+                </button>
+              </div>
+              <button class="membership-button" type="button" data-action="submit" data-testid="submit-button">立即创作</button>
+            </div>
+          </div>
+
+          <div class="project-picker-bar">
+            <div class="project-picker-control">
+              <button class="project-picker-trigger" type="button" data-action="project-picker" data-testid="project-picker-trigger" data-dropdown-boundary aria-haspopup="menu" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h6l2-2h4.8a2 2 0 0 1 2 2v1M4.5 8.5h15a1.5 1.5 0 0 1 1.45 1.88l-2 7.5A2.2 2.2 0 0 1 16.82 19.5H4.7a2 2 0 0 1-2-2.2l.6-7.45A1.5 1.5 0 0 1 4.5 8.5Z"/></svg>
+                <span data-selected-project-label>选择项目</span><i aria-hidden="true"></i>
+              </button>
+              <div class="project-picker-menu" data-panel="project-picker" data-testid="project-picker-menu" data-dropdown-boundary role="menu" hidden>
+                <button class="project-picker-clear" type="button" role="menuitem" data-select-project="">不选择项目</button>
+                <div data-project-picker-options></div>
+                <div class="project-picker-divider" role="separator"></div>
+                <button class="project-picker-create" type="button" role="menuitem" data-action="create-project-from-picker" aria-label="新建项目"><span aria-hidden="true">＋</span><span>新建项目</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="floating-menu add-menu" data-panel="add" data-testid="add-menu" data-dropdown-boundary hidden role="menu">
+            <button type="button" role="menuitem" data-action="upload-local-materials">上传本地素材</button>
+            <button type="button" role="menuitem" data-action="open-asset-picker">从素材库选择</button>
+            <button type="button" role="menuitem" data-action="open-knowledge-picker">从资料库选择</button>
+            <input type="file" multiple webkitdirectory directory data-testid="local-folder-input" hidden>
+          </div>
+
+          <div class="floating-menu skill-menu" data-panel="skill" data-testid="skill-menu" data-dropdown-boundary hidden role="dialog" aria-label="选择 Skill">
+            <div class="composer-skill-head">
+              <span><strong>Skill</strong><span class="info-control"><button type="button" aria-label="Skill 说明"><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 10.5v5"/><path d="M12 7.5h.01"/></svg></button><span class="info-tooltip" role="tooltip" data-testid="skill-help-tooltip">选择 Skill 后会添加到当前输入，Agent 将按照 Skill 的说明完成任务。</span></span></span>
+              <div class="composer-skill-head-actions">
+                <label><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg><input type="search" data-testid="composer-skill-search" placeholder="搜索 Skill" aria-label="搜索 Skill"></label>
+              </div>
+            </div>
+            <div class="composer-skill-tabs" role="tablist" aria-label="首页 Skill 分类">
+              <button class="active" type="button" role="tab" aria-selected="true" data-composer-skill-category="all">全部</button>
+              <button class="composer-skill-mine-tab" type="button" role="tab" aria-selected="false" data-composer-skill-category="mine">我的</button>
+              <button type="button" role="tab" aria-selected="false" data-composer-skill-category="education">教育</button>
+              <button type="button" role="tab" aria-selected="false" data-composer-skill-category="social">社交</button>
+              <button type="button" role="tab" aria-selected="false" data-composer-skill-category="ecommerce">电商</button>
+            </div>
+            <div class="composer-skill-results" data-composer-skill-results>
+              <p data-composer-skill-empty hidden>没有找到匹配的 Skill</p>
+            </div>
+          </div>
+
+          <section class="model-popover" data-panel="model" data-testid="model-popover" data-dropdown-boundary hidden>
+            <div class="model-header">
+              <div class="model-title">模型配置 <span class="info-control"><button type="button" aria-label="模型配置说明"><svg class="info-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 10.5v5"/><path d="M12 7.5h.01"/></svg></button><span class="info-tooltip" role="tooltip" data-testid="model-help-tooltip">选择 Agent 使用的模型，以及任务中可调用的生成模型。</span></span></div>
+            </div>
+            <div class="model-tabs" role="tablist" aria-label="模型类型">
+              <button class="active" type="button" role="tab" aria-selected="true" data-mode="agent">Agent</button>
+              <button type="button" role="tab" aria-selected="false" data-mode="video">视频</button>
+              <button type="button" role="tab" aria-selected="false" data-mode="image">图片</button>
+              <button type="button" role="tab" aria-selected="false" data-mode="audio">音频</button>
+            </div>
+            <div class="model-list" data-testid="model-list">
+              <div class="model-list-head"><p data-testid="model-list-title">Agent模型</p><button type="button" role="checkbox" aria-checked="false" data-action="toggle-all-models"><span aria-hidden="true">✓</span>全选</button></div>
+              <div class="model-options" data-model-options></div>
+            </div>
+            <footer class="model-footer">
+              <label><input type="checkbox" checked><span>同时设为新对话默认</span></label>
+            </footer>
+          </section>
+
+        </section>
+
+        <section class="inspiration" aria-label="创作资源">
+          <div class="discovery-toolbar">
+            <div class="discovery-tabs" role="tablist" aria-label="创作资源分类">
+              <button class="active" type="button" role="tab" aria-selected="true" data-discovery-tab="tools">创作工具</button>
+              <button type="button" role="tab" aria-selected="false" data-discovery-tab="skills">Skill广场</button>
+            </div>
+            <label class="home-discovery-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg><input type="search" data-testid="home-discovery-search" aria-label="搜索创作工具或 Skill" placeholder="搜索创作工具或 Skill"></label>
+          </div>
+          <div class="creation-tool-categories" data-testid="creation-tool-categories" role="tablist" aria-label="创作工具分类">
+            <button class="active" type="button" role="tab" aria-selected="true" data-creation-category="all">全部</button>
+            <button type="button" role="tab" aria-selected="false" data-creation-category="generate">素材生成</button>
+            <button type="button" role="tab" aria-selected="false" data-creation-category="acquire">素材获取</button>
+            <button type="button" role="tab" aria-selected="false" data-creation-category="video" hidden>视频生成</button>
+          </div>
+          <div class="home-skill-categories" data-testid="home-skill-categories" role="tablist" aria-label="Skill 行业分类" hidden>
+            <button class="active" type="button" role="tab" aria-selected="true" data-home-skill-category="all">全部</button>
+            <button type="button" role="tab" aria-selected="false" data-home-skill-category="education">教育</button>
+            <button type="button" role="tab" aria-selected="false" data-home-skill-category="social">社交</button>
+            <button type="button" role="tab" aria-selected="false" data-home-skill-category="ecommerce">电商</button>
+          </div>
+          <div class="discovery-panel creation-tool-sections" data-discovery-panel="tools" data-testid="creation-tools-panel" aria-label="创作工具列表"></div>
+          <div class="discovery-panel" data-discovery-panel="skills" data-testid="skill-plaza-panel" hidden>
+            <section class="skill-shelf" data-testid="skill-shelf" aria-label="Skill 广场"></section>
+          </div>
+          <div class="discovery-panel unified-discovery-results" data-testid="home-discovery-results" hidden></div>
+          <div class="discovery-empty" data-testid="home-discovery-empty" hidden>未找到匹配的创作工具或 Skill</div>
+        </section>
+        </div>
+
+        <section class="workspace-view conversation-view" data-view="conversation" data-testid="conversation-view" hidden aria-label="创作对话">
+          <header class="conversation-header">
+            <button class="conversation-back" type="button" data-action="conversation-back" aria-label="返回开始创作">‹</button>
+            <div class="conversation-heading">
+              <h1 data-testid="conversation-title" data-action="rename-conversation-title" role="button" tabindex="0" aria-label="重命名对话标题" title="">新建对话</h1>
+              <input class="conversation-title-input" data-testid="conversation-title-input" aria-label="对话标题" aria-describedby="conversation-title-limit conversation-title-error" aria-errormessage="conversation-title-error" type="text" hidden>
+              <span class="visually-hidden" id="conversation-title-limit">最多输入 30 个用户可见字符</span>
+              <span class="conversation-title-error" id="conversation-title-error" data-testid="conversation-title-error" role="alert" hidden>对话名称不能超出30个字符</span>
+              <span class="scheduled-conversation-status" data-testid="scheduled-conversation-status" hidden></span>
+            </div>
+            <div class="conversation-header-actions" data-conversation-share>
+              <button class="conversation-share-trigger" type="button" data-action="conversation-share" aria-label="分享对话" aria-haspopup="dialog" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.3 10.8 7.4-4.5M8.3 13.2l7.4 4.5"/></svg>
+              </button>
+              <div class="conversation-share-popover" data-testid="conversation-share-popover" role="dialog" aria-label="分享当前对话" hidden>
+                <strong data-testid="conversation-share-title">分享当前对话</strong>
+                <p>任何获得链接的人都可以打开这次对话。</p>
+                <label><span>分享链接</span><input data-testid="conversation-share-link" aria-label="分享链接" type="text" readonly></label>
+                <button class="conversation-share-copy" type="button" data-action="copy-conversation-share">复制</button>
+              </div>
+            </div>
+          </header>
+          <div class="conversation-thread" data-testid="conversation-thread">
+            <article class="conversation-message conversation-message--user" data-testid="conversation-user-message">
+              <span data-conversation-context data-testid="conversation-context" hidden></span>
+              <p data-conversation-prompt></p>
+            </article>
+          </div>
+          <div class="conversation-composer" data-testid="conversation-composer">
+            <div class="conversation-composer-input-row">
+              <div class="composer-modules" data-testid="conversation-selected-modules" aria-label="已选功能模块" hidden></div>
+              <div class="composer-references" data-testid="conversation-selected-references" aria-label="已选素材与连接器" hidden></div>
+              <textarea data-testid="conversation-input" data-command-input aria-label="继续对话" aria-haspopup="listbox" aria-expanded="false" aria-controls="composer-command-menu" placeholder="继续输入你的要求…"></textarea>
+            </div>
+            <div class="composer-toolbar conversation-composer-toolbar">
+              <div class="toolbar-left">
+                <button class="round-add" type="button" data-action="add" data-dropdown-boundary aria-label="添加素材" aria-expanded="false"><span></span></button>
+                <button class="tool-button" type="button" data-action="model" data-testid="conversation-model-trigger" data-dropdown-boundary aria-label="模型" aria-expanded="false"><svg class="functional-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.4 7.7 7.6 4.4 7.6-4.4M12 12.1V21"/></svg><span>模型</span></button>
+                <i class="toolbar-divider"></i>
+                <button class="tool-button" type="button" data-action="skill" data-testid="conversation-skill-trigger" data-dropdown-boundary aria-label="技能" aria-expanded="false"><svg class="functional-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3.5v3.5M15 3.5v3.5M9 17v3.5M15 17v3.5M3.5 9H7M17 9h3.5M3.5 15H7M17 15h3.5"/></svg><span>技能</span></button>
+              </div>
+              <button class="conversation-send" type="button" data-action="conversation-send" aria-label="发送消息">↵</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-view project-library-view" data-view="projects" data-testid="projects-view" hidden aria-labelledby="projects-view-title">
+          <header class="project-library-header function-page-header">
+            <h1 id="projects-view-title">项目·素材</h1>
+            <p data-function-page-description>整理创作页面、管理项目资产，集中呈现项目内容</p>
+          </header>
+
+          <div class="project-library-content">
+            <div class="project-library-nav-row">
+              <div class="project-library-tabs" data-testid="project-library-tabs" role="tablist" aria-label="项目·素材分类">
+                <button class="active" type="button" role="tab" aria-selected="true" data-library-tab="projects">我的项目</button>
+                <button type="button" role="tab" aria-selected="false" data-library-tab="assets">素材库</button>
+              </div>
+              <button class="project-conversation-top-back" type="button" data-action="project-conversations-back" data-testid="project-conversations-top-back" hidden>← 返回项目列表</button>
+              <button class="project-new-button" type="button" data-action="new-personal-project" data-testid="new-project-trigger"><span>＋</span> 新建项目</button>
+            </div>
+
+            <div data-library-panel="projects" data-testid="my-projects-panel">
+              <div class="project-toolbar">
+                <div class="project-tabs" data-testid="project-scope-tabs" role="tablist" aria-label="项目类型">
+                  <button class="active" type="button" role="tab" aria-selected="true" data-project-tab="personal">个人项目</button>
+                  <button type="button" role="tab" aria-selected="false" data-project-tab="team">团队项目</button>
+                </div>
+                <div class="project-utilities">
+                  <label class="project-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><input type="search" data-testid="project-search" placeholder="搜索项目" aria-label="搜索项目"></label>
+                  <div class="project-sort-wrap" data-dropdown-boundary>
+                    <button class="project-sort" type="button" data-action="toggle-project-sort" data-testid="project-sort-trigger" aria-haspopup="menu" aria-expanded="false"><span data-project-sort-label>最近更新</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 9 5 5 5-5"/></svg></button>
+                    <div class="project-sort-menu" data-testid="project-sort-menu" role="menu" aria-label="项目排列顺序" hidden>
+                      <p>排列顺序</p>
+                      <button type="button" role="menuitemradio" aria-checked="true" data-project-card-sort="updated"><span>最近更新</span><i>✓</i></button>
+                      <button type="button" role="menuitemradio" aria-checked="false" data-project-card-sort="created"><span>最近创建</span><i>✓</i></button>
+                      <button type="button" role="menuitemradio" aria-checked="false" data-project-card-sort="name"><span>字母顺序</span><i>✓</i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="project-panel" data-project-panel="personal">
+                <div class="project-card-grid" data-testid="personal-projects">
+                  <article class="project-folder-card" data-project-item data-project-id="project-guide" data-project-scope="personal" data-project-name="项目新手指引" data-project-created="1" data-project-updated="1" data-testid="project-card-guide">
+                    <button class="project-open-button" type="button" data-action="open-project" aria-label="打开 项目新手指引"><span class="folder-card-visual" aria-hidden="true"><i></i><b><svg viewBox="0 0 24 24"><path d="M4.5 8h6l2-2h4a2 2 0 0 1 2 2v1M5 9h14a1.5 1.5 0 0 1 1.4 2l-1.8 6.3a2 2 0 0 1-1.9 1.4H5a2 2 0 0 1-2-2.2l.5-6.1A1.5 1.5 0 0 1 5 9Z"/></svg></b></span><span class="folder-card-info"><strong title="项目新手指引">项目新手指引</strong><small>2026.8.26</small></span></button>
+                    <button class="project-move-button" type="button" data-action="toggle-project-move" data-dropdown-boundary aria-label="移动 项目新手指引" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10m0 0-3-3m3 3-3 3M17 17H7m0 0 3-3m-3 3 3 3"/></svg></button>
+                    <button class="project-rename-button" type="button" data-action="rename-project" aria-label="重命名 项目新手指引"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4ZM13.5 6.5l4 4"/></svg></button>
+                    <div class="project-move-menu" data-project-move-menu data-dropdown-boundary hidden role="menu"><button type="button" role="menuitem" data-action="move-project" data-move-project-to="team">移动到团队项目</button></div>
+                  </article>
+                </div>
+              </div>
+              <div class="project-panel" data-project-panel="team" hidden>
+                <div class="project-card-grid" data-testid="team-projects"><div class="project-empty-state">暂无团队项目</div></div>
+              </div>
+              <section class="project-directory-view" data-testid="project-directory-view" hidden>
+                <button class="project-directory-back" type="button" data-action="project-directory-back">← 返回项目列表</button>
+                <p class="project-directory-breadcrumb"><span data-project-directory-project>项目新手指引</span><i>／</i><span data-project-directory-breadcrumb>项目内容</span></p>
+                <header><div><h2 data-project-directory-title>项目内容</h2><p>查看并管理当前目录下的页面、文档与素材。</p></div><button type="button" data-action="new-project-entry">＋ 新建内容</button></header>
+                <div class="project-directory-layout">
+                  <div class="project-entry-list" data-testid="project-entry-list">
+                    <button class="active" type="button" data-project-file="overview" data-project-id="project-guide"><span class="project-entry-icon">文</span><span><strong>项目说明.md</strong><small>项目目标、协作方式与使用说明</small></span></button>
+                    <button type="button" data-project-file="assets" data-project-id="project-guide"><span class="project-entry-icon">夹</span><span><strong>素材清单</strong><small>项目引用的图片、音频与文案</small></span></button>
+                    <button type="button" data-project-file="history" data-project-id="project-guide"><span class="project-entry-icon">记</span><span><strong>更新记录.md</strong><small>最近的内容与版本变更</small></span></button>
+                  </div>
+                  <article class="project-entry-preview" data-testid="project-entry-preview"><span>当前内容</span><h3 data-project-entry-preview-title>项目说明.md</h3><p data-project-entry-preview-copy>这里展示项目目录的内容预览。选择左侧条目可切换当前内容。</p><button type="button" data-action="use-project-entry">在创作中使用</button></article>
+                </div>
+              </section>
+              <section class="project-conversations-view" data-testid="project-conversations-view" hidden>
+                <p class="project-directory-breadcrumb"><span data-project-conversations-project>项目新手指引</span><i>／</i><span>子对话</span></p>
+                <header><div><h2 data-project-conversations-title>项目新手指引的子对话</h2><p>在当前页面查看并继续该项目下的创作对话。</p></div><button type="button" data-action="new-project-conversation-page">＋ 新建对话</button></header>
+                <div class="project-conversation-list" data-testid="project-conversation-list"></div>
+              </section>
+            </div>
+
+            <div class="asset-library-panel" data-library-panel="assets" data-testid="asset-library-panel" hidden>
+              <div class="asset-library-toolbar">
+                <div class="project-tabs" data-testid="asset-scope-tabs" role="tablist" aria-label="素材库项目类型">
+                  <button class="active" type="button" role="tab" aria-selected="true" data-asset-scope="personal">个人素材</button>
+                  <button type="button" role="tab" aria-selected="false" data-asset-scope="team">团队素材</button>
+                </div>
+                <label class="asset-project-switcher">切换项目
+                  <select data-testid="asset-project-select" aria-label="素材库项目"></select>
+                </label>
+              </div>
+              <div class="asset-library-placeholder">
+                <span class="asset-placeholder-icon" aria-hidden="true">▣</span>
+                <h2>素材库敬请期待</h2>
+                <p>后续将在当前项目下集中展示图片、音频和视频素材。</p>
+                <strong data-asset-current-project>项目新手指引</strong>
+                <div class="asset-search-location" data-testid="asset-search-location" hidden><span>已定位素材</span><strong data-asset-search-name></strong></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-view module-view skills-module-view" data-view="skills" data-testid="skills-view" hidden aria-labelledby="skills-view-title">
+          <header class="skills-page-header function-page-header">
+            <h1 id="skills-view-title">技能</h1>
+            <p data-function-page-description>浏览并使用可调用的 Skill，扩展创作能力</p>
+          </header>
+          <div class="capability-tabs" data-testid="capability-tabs" role="tablist" aria-label="技能与连接器" hidden>
+            <button class="active" type="button" role="tab" aria-selected="true" data-capability-tab="skills"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 3.5v3.5M15 3.5v3.5M9 17v3.5M15 17v3.5M3.5 9H7M17 9h3.5M3.5 15H7M17 15h3.5"/></svg>技能</button>
+            <button type="button" role="tab" aria-selected="false" data-capability-tab="connectors"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 8.5 7 11a3.5 3.5 0 0 0 5 5l2.5-2.5M14.5 15.5 17 13a3.5 3.5 0 1 0-5-5L9.5 10.5"/></svg>连接器</button>
+          </div>
+          <div data-capability-panel="skills">
+            <div class="skill-control-row">
+              <div class="skill-subtabs" data-testid="skill-subtabs" role="tablist" aria-label="Skill 页面">
+                <span class="skill-tab-with-info"><button class="active" type="button" role="tab" aria-selected="true" data-skill-tab="plaza">Skill</button><span class="info-control skill-page-info"><button class="skill-page-info-button" type="button" aria-label="Skill 页面说明"><svg class="info-icon skill-page-info-icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25"/><path d="M10 9.2v4.2"/><path d="M10 6.65h.01"/></svg></button><span class="info-tooltip" role="tooltip" data-testid="skill-page-help-tooltip">选择 Skill 后会添加到当前输入，Agent 将按照 Skill 的说明完成任务。</span></span></span>
+                <button type="button" role="tab" aria-selected="false" data-skill-tab="mine">我的 Skill</button>
+              </div>
+              <div class="skill-actions">
+                <label class="skill-search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg><input type="search" aria-label="搜索 Skill" data-testid="skill-search" placeholder="搜索 Skill..."></label>
+              </div>
+            </div>
+            <div class="skill-categories" data-testid="skill-categories" role="tablist" aria-label="Skill 分类">
+              <button class="active" type="button" role="tab" aria-selected="true" data-skill-category="all">全部</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="featured">精选</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="short-film">短剧漫剧</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="film">专业影视</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="animation">动画</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="ads">商业广告</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="ecommerce">电商</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="education">教育</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="creative">创意实验</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="audio">音频音乐</button>
+              <button type="button" role="tab" aria-selected="false" data-skill-category="platform">平台工具</button>
+            </div>
+            <div class="module-body tab-panel" data-skill-panel="plaza">
+              <div class="skill-grid" data-skill-grid>
+                <article class="skill-card" data-testid="skill-card-brand" data-skill-card data-skill-categories="featured ads ecommerce" data-composer-skill-categories="ecommerce"><div class="skill-art skill-art--brand">Aa</div><div class="skill-copy"><span class="card-label">视觉设计</span><h2>品牌视觉助手</h2><p>将品牌定位转化为一致的视觉方向、文案语气和设计建议。</p><small>推荐：品牌广告、包装、视觉提案</small></div><button class="card-action" type="button" data-use-skill="品牌视觉助手" data-testid="use-skill-brand">添加并使用</button></article>
+                <article class="skill-card" data-testid="skill-card-motion" data-skill-card data-skill-categories="featured film animation creative" data-composer-skill-categories="social"><div class="skill-art skill-art--motion">◫</div><div class="skill-copy"><span class="card-label">动态内容</span><h2>UI 动效导演</h2><p>把界面描述拆解为节奏、转场与关键帧建议。</p><small>推荐：产品演示、界面动效</small></div><button class="card-action" type="button" data-use-skill="UI 动效导演">添加并使用</button></article>
+                <article class="skill-card" data-testid="skill-card-copy" data-skill-card data-skill-categories="ads ecommerce education platform" data-composer-skill-categories="social ecommerce education"><div class="skill-art skill-art--copy">文</div><div class="skill-copy"><span class="card-label">内容创作</span><h2>营销文案策划</h2><p>根据平台、受众和目标生成结构清晰的传播内容。</p><small>推荐：社媒、活动、产品发布</small></div><button class="card-action" type="button" data-use-skill="营销文案策划">添加并使用</button></article>
+                <div class="skill-empty-results" data-testid="skill-empty-results" hidden><span>⌕</span><strong>没有找到匹配的 Skill</strong><small>尝试更换关键词或分类</small></div>
+              </div>
+            </div>
+            <div class="module-body tab-panel" data-skill-panel="mine" data-testid="my-skills-panel" hidden><div class="installed-skills" data-installed-skills><div class="empty-state"><h2>还没有安装 Skill</h2><p>选择Skill运行成功后会添加到此处</p></div></div></div>
+          </div>
+          <div class="module-body capability-panel" data-capability-panel="connectors" data-testid="connectors-panel" hidden>
+            <div class="connector-grid"><article class="connector-card" hidden><span class="connector-logo">飞</span><div><h2>飞书文档</h2><p>读取已授权的文档与知识内容。</p></div><button type="button" data-connect="飞书文档">连接</button></article><article class="connector-card" hidden><span class="connector-logo connector-logo--drive">云</span><div><h2>云端文件</h2><p>从云端文件空间选择创作素材。</p></div><button type="button" data-connect="云端文件">连接</button></article><article class="connector-card placeholder-card" hidden><span class="connector-logo">＋</span><div><h2>更多连接器</h2><p>新的连接器正在准备中。</p></div><span class="placeholder-badge">敬请期待</span></article></div>
+          </div>
+        </section>
+
+        <section class="workspace-view module-view" data-view="tools" data-testid="tools-view" hidden aria-labelledby="tools-view-title">
+          <header class="module-header"><div><h1 id="tools-view-title">创作工具</h1><p>按创作环节快速调用工具，探索更多创作能力。</p></div></header>
+          <div class="module-body tool-sections">
+            <section hidden><div class="section-heading"><div><h2>自定义智能体</h2><p>创建贴合团队工作流的专属 Agent</p></div></div><div class="tool-grid"><button class="tool-card tool-card--wide" type="button" data-tool="自定义智能体"><span class="tool-glyph">✦</span><span><strong>创建智能体</strong><small>配置角色、任务和调用方式</small></span><em>暂未上线</em></button></div></section>
+            <section><div class="section-heading"><div><h2>AI 绘图</h2><p>从灵感到视觉稿</p></div></div><div class="tool-grid"><button class="tool-card" type="button" data-tool="AI 绘图"><span class="tool-glyph">◒</span><span><strong>AI 绘图</strong><small>文字生成视觉画面</small></span></button><button class="tool-card" type="button" data-tool="图像编辑"><span class="tool-glyph">◩</span><span><strong>图像编辑</strong><small>调整、扩展与局部重绘</small></span></button></div></section>
+            <section><div class="section-heading"><div><h2>办公套件</h2><p>常用内容生产工具</p></div></div><div class="tool-grid"><button class="tool-card" type="button" data-tool="AI 写作" data-testid="tool-ai-writing"><span class="tool-glyph">文</span><span><strong>AI 写作</strong><small>提纲、长文与营销内容</small></span></button><button class="tool-card" type="button" data-tool="AI 表格"><span class="tool-glyph">表</span><span><strong>AI 表格</strong><small>整理与分析结构化信息</small></span></button><button class="tool-card" type="button" data-tool="AI 演示"><span class="tool-glyph">演</span><span><strong>AI 演示</strong><small>快速生成演示提纲</small></span></button></div></section>
+          </div>
+        </section>
+
+        <section class="workspace-view knowledge-view" data-view="knowledge" data-testid="knowledge-view" hidden aria-labelledby="knowledge-view-title">
+          <div class="knowledge-shell" data-testid="knowledge-shell">
+            <div class="knowledge-directory-data" hidden>
+                <nav class="knowledge-directory-list" data-testid="knowledge-public-directory-list" aria-label="公共资料库目录"></nav>
+                <nav class="knowledge-directory-list" data-testid="knowledge-private-directory-list" aria-label="个人文档目录" hidden>
+                  <button class="active" type="button" data-knowledge-directory="all" data-testid="knowledge-directory-all"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h6l2-2h5a2 2 0 0 1 2 2v1M4.5 8.5h15a1.5 1.5 0 0 1 1.45 1.88l-1.8 6.8a2 2 0 0 1-1.94 1.49H4.8a2 2 0 0 1-2-2.18l.5-6.6A1.5 1.5 0 0 1 4.5 8.5Z"/></svg><span>全部文档</span><em>03</em></button>
+                  <button type="button" data-knowledge-directory="notes" data-testid="knowledge-directory-notes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h6l2-2h5a2 2 0 0 1 2 2v1M4.5 8.5h15a1.5 1.5 0 0 1 1.45 1.88l-1.8 6.8a2 2 0 0 1-1.94 1.49H4.8a2 2 0 0 1-2-2.18l.5-6.6A1.5 1.5 0 0 1 4.5 8.5Z"/></svg><span>个人资料</span><em>02</em></button>
+                  <button type="button" data-knowledge-directory="drafts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h6l2-2h5a2 2 0 0 1 2 2v1M4.5 8.5h15a1.5 1.5 0 0 1 1.45 1.88l-1.8 6.8a2 2 0 0 1-1.94 1.49H4.8a2 2 0 0 1-2-2.18l.5-6.6A1.5 1.5 0 0 1 4.5 8.5Z"/></svg><span>草稿箱</span><em>01</em></button>
+                </nav>
+            </div>
+
+            <main class="knowledge-main">
+              <div class="knowledge-space-tabs" data-testid="knowledge-space-tabs" role="tablist" aria-label="资料库空间">
+                <button class="knowledge-space active" id="knowledge-space-tab-public" type="button" role="tab" data-knowledge-space="public" data-testid="knowledge-space-public" aria-controls="knowledge-documents" aria-selected="true" aria-pressed="true" tabindex="0">项目空间</button>
+                <button class="knowledge-space" id="knowledge-space-tab-private" type="button" role="tab" data-knowledge-space="private" data-testid="knowledge-space-private" aria-controls="knowledge-documents" aria-selected="false" aria-pressed="false" tabindex="-1">个人空间</button>
+              </div>
+              <header class="knowledge-header function-page-header">
+                <div class="knowledge-heading-copy"><h1 id="knowledge-view-title" data-knowledge-space-title>项目公共空间</h1><span data-knowledge-space-description data-function-page-description>项目成员在同一目录下查找、预览与协作文档</span></div>
+                <div class="knowledge-header-actions" data-function-page-action><span class="knowledge-folder-permission" data-testid="knowledge-folder-permission" hidden><button type="button" data-action="new-knowledge-folder" data-testid="knowledge-new-folder" disabled><span aria-hidden="true">＋</span>新建文件夹</button></span><button class="primary" type="button" data-action="add-knowledge-content"><span aria-hidden="true">＋</span>添加内容</button></div>
+              </header>
+
+              <div class="knowledge-filter-tabs" role="tablist" aria-label="文档状态" hidden><button class="active" id="knowledge-filter-tab-all" type="button" role="tab" data-knowledge-filter="all" data-testid="knowledge-filter-all" aria-controls="knowledge-documents" aria-selected="true" tabindex="0">全部文档</button><button id="knowledge-filter-tab-trash" type="button" role="tab" data-knowledge-filter="trash" data-testid="knowledge-recycle-bin" aria-controls="knowledge-documents" aria-selected="false" tabindex="-1">回收站</button></div>
+              <div class="knowledge-toolbar">
+                <label class="knowledge-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg><input type="search" aria-label="搜索资料库文档" data-testid="knowledge-search" placeholder="在当前空间搜索文档"></label>
+                <label class="knowledge-project-filter"><span>项目</span><select data-testid="knowledge-project-filter" aria-label="筛选项目"><option value="all">全部项目</option></select></label>
+                <div class="knowledge-sort-cluster"><span class="knowledge-sort-label">排序</span><div class="knowledge-sort knowledge-segmented-control" role="group" aria-label="排序方式"><button class="active" type="button" data-knowledge-sort="updated" data-testid="knowledge-sort-updated" aria-pressed="true">更新时间</button><button type="button" data-knowledge-sort="name" data-testid="knowledge-sort-name" aria-pressed="false">名称</button></div></div>
+                <div class="knowledge-view-switch knowledge-segmented-control" role="group" aria-label="文档视图"><button class="active" type="button" data-knowledge-view="list" data-testid="knowledge-list-view" aria-label="列表视图" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h11M8 12h11M8 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg></button><button type="button" data-knowledge-view="grid" data-testid="knowledge-grid-view" aria-label="网格视图" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg></button></div>
+                <button class="knowledge-import-selected" type="button" data-action="import-selected-knowledge" data-testid="knowledge-import-selected" hidden>导入对话</button>
+              </div>
+
+              <section class="knowledge-documents" id="knowledge-documents" data-testid="knowledge-documents" role="tabpanel" aria-labelledby="knowledge-space-tab-public" tabindex="0">
+                <div class="knowledge-table-head"><input type="checkbox" aria-label="选择全部文档" data-testid="knowledge-select-all"><span>名称</span><span>所属目录</span><span class="knowledge-owner-column">所有者</span><span>更新时间</span><span></span></div>
+                <div class="knowledge-table-body" data-knowledge-table-body>
+                  <article class="knowledge-document-row active" data-knowledge-row data-space="public" data-knowledge-directory-id="knowledge-directory-guide" data-name="Q3 产品路线图.docx" data-updated="6"><input type="checkbox" aria-label="选择 Q3 产品路线图.docx" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-docx">DOCX</span><div><strong>Q3 产品路线图.docx</strong><small>v2.4 · 明确第三季度产品节奏、关键里程碑与各团队交付节点。</small></div></div><span class="knowledge-directory-cell">项目新手指引</span><span class="knowledge-owner-column">林知远</span><span class="knowledge-updated-cell">今天 10:42<small class="status-ready">可用</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" data-testid="import-knowledge" aria-label="导入 Q3 产品路线图.docx 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="public" data-knowledge-directory-id="knowledge-directory-guide" data-name="品牌投放复盘.pdf" data-updated="5"><input type="checkbox" aria-label="选择 品牌投放复盘.pdf" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-pdf">PDF</span><div><strong>品牌投放复盘.pdf</strong><small>v1.3 · 汇总阶段投放表现、渠道差异与下一轮预算调整建议。</small></div></div><span class="knowledge-directory-cell">项目新手指引</span><span class="knowledge-owner-column">周明月</span><span class="knowledge-updated-cell">今天 09:18<small class="status-processing">解析中</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 品牌投放复盘.pdf 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="public" data-knowledge-directory-id="knowledge-directory-guide" data-name="客户需求清单.md" data-updated="4"><input type="checkbox" aria-label="选择 客户需求清单.md" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-md">MD</span><div><strong>客户需求清单.md</strong><small>v3.1 · 记录客户侧已确认需求、待澄清事项和对应责任人。</small></div></div><span class="knowledge-directory-cell">项目新手指引</span><span class="knowledge-owner-column">陈慧明</span><span class="knowledge-updated-cell">昨天 18:36<small class="status-ready">可用</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 客户需求清单.md 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="public" data-knowledge-directory-id="knowledge-directory-guide" data-name="9 月项目例会纪要.md" data-updated="3"><input type="checkbox" aria-label="选择 9 月项目例会纪要.md" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-md">MD</span><div><strong>9 月项目例会纪要.md</strong><small>v1.0 · 沉淀 9 月例会决策、风险项和后续负责人。</small></div></div><span class="knowledge-directory-cell">项目新手指引</span><span class="knowledge-owner-column">许舒</span><span class="knowledge-updated-cell">昨天 16:05<small class="status-ready">可用</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 9 月项目例会纪要.md 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="public" data-knowledge-directory-id="knowledge-directory-guide" data-name="渠道预算说明.pdf" data-updated="2"><input type="checkbox" aria-label="选择 渠道预算说明.pdf" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-pdf">PDF</span><div><strong>渠道预算说明.pdf</strong><small>v1.1 · 文件包含受保护页面，当前无法提取正文内容。</small></div></div><span class="knowledge-directory-cell">项目新手指引</span><span class="knowledge-owner-column">周明月</span><span class="knowledge-updated-cell">09-05 14:22<small class="status-failed">解析失败&nbsp; 重试</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 渠道预算说明.pdf 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="public" data-knowledge-directory-id="knowledge-directory-guide" data-name="内容使用确认函.pdf" data-updated="1"><input type="checkbox" aria-label="选择 内容使用确认函.pdf" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-pdf">PDF</span><div><strong>内容使用确认函.pdf</strong><small>v1.0 · 客户已确认内容使用范围和公开渠道。</small></div></div><span class="knowledge-directory-cell">项目新手指引</span><span class="knowledge-owner-column">林知远</span><span class="knowledge-updated-cell">09-03 11:40<small class="status-ready">可用</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 内容使用确认函.pdf 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="private" data-knowledge-directory-id="notes" data-name="个人创作备忘.md" data-updated="3" hidden><input type="checkbox" aria-label="选择 个人创作备忘.md" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-md">MD</span><div><strong>个人创作备忘.md</strong><small>v1.2 · 记录个人创作方向、提示词和待处理想法。</small></div></div><span class="knowledge-directory-cell">个人资料</span><span class="knowledge-owner-column">我</span><span class="knowledge-updated-cell">今天 11:20<small class="status-ready">可用</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 个人创作备忘.md 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="private" data-knowledge-directory-id="notes" data-name="品牌灵感收集.pdf" data-updated="2" hidden><input type="checkbox" aria-label="选择 品牌灵感收集.pdf" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-pdf">PDF</span><div><strong>品牌灵感收集.pdf</strong><small>v1.0 · 个人收藏的品牌案例与视觉参考。</small></div></div><span class="knowledge-directory-cell">个人资料</span><span class="knowledge-owner-column">我</span><span class="knowledge-updated-cell">昨天 17:10<small class="status-ready">可用</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 品牌灵感收集.pdf 到对话">›</button></article>
+                  <article class="knowledge-document-row" data-knowledge-row data-space="private" data-knowledge-directory-id="drafts" data-name="未发布脚本.docx" data-updated="1" hidden><input type="checkbox" aria-label="选择 未发布脚本.docx" data-knowledge-select><div class="knowledge-file"><span class="knowledge-file-type type-docx">DOCX</span><div><strong>未发布脚本.docx</strong><small>v0.6 · 尚在整理中的个人内容脚本。</small></div></div><span class="knowledge-directory-cell">草稿箱</span><span class="knowledge-owner-column">我</span><span class="knowledge-updated-cell">09-18 14:30<small class="status-ready">可用</small></span><button class="knowledge-row-menu" type="button" data-action="import-knowledge" aria-label="导入 未发布脚本.docx 到对话">›</button></article>
+                </div>
+                <div class="knowledge-empty" data-testid="knowledge-empty" hidden><strong>没有找到文档</strong><span>尝试更换目录或搜索关键词</span></div>
+              </section>
+              <footer class="knowledge-footer"><span>共 <strong data-knowledge-visible-count>6</strong> 个文档</span><span>文件进入云端后依次经过校验、解析和检索处理</span></footer>
+            </main>
+          </div>
+        </section>
+
+        <section class="workspace-view script-library-view" data-view="scripts" data-testid="script-library-view" hidden aria-label="脚本库"></section>
+
+        <section class="workspace-view scheduled-tasks-view" data-view="scheduled-tasks" data-testid="scheduled-tasks-view" hidden aria-labelledby="scheduled-tasks-title">
+          <div class="scheduled-task-main">
+            <header class="scheduled-task-header function-page-header">
+              <div><h1 id="scheduled-tasks-title">定时任务</h1><p data-function-page-description>安排自动运行的任务，设置通知并随时管理运行状态</p></div>
+              <div class="scheduled-create-wrap">
+                <button class="scheduled-create-button" type="button" data-action="scheduled-create-menu" data-testid="scheduled-task-create" data-dropdown-boundary data-function-page-action aria-haspopup="menu" aria-expanded="false">创建 <i aria-hidden="true"></i></button>
+                <div class="scheduled-create-menu" data-panel="scheduled-create" data-testid="scheduled-task-create-menu" data-dropdown-boundary role="menu" hidden>
+                  <button type="button" role="menuitem" data-action="scheduled-create-chat">对话创建</button>
+                  <button type="button" role="menuitem" data-action="scheduled-create-manual">手动设置</button>
+                </div>
+              </div>
+            </header>
+            <label class="scheduled-task-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4 4"/></svg><input type="search" data-testid="scheduled-task-search" aria-label="搜索已安排任务" placeholder="搜索已安排任务"></label>
+            <div class="scheduled-task-list" data-testid="scheduled-task-list"></div>
+            <div class="scheduled-task-empty" data-testid="scheduled-task-empty">未找到已安排任务</div>
+          </div>
+
+          <aside class="scheduled-task-drawer" data-testid="scheduled-task-drawer" aria-label="手动设置定时任务" hidden>
+            <header><div><strong data-testid="scheduled-drawer-mode-title">新建</strong><span>手动设置定时任务</span></div><button type="button" data-action="close-scheduled-drawer" aria-label="关闭手动设置">×</button></header>
+            <div class="scheduled-drawer-body">
+              <label class="scheduled-title-field"><span>给任务创建名称</span><textarea aria-label="已安排任务标题" data-testid="scheduled-task-title" placeholder="描述任务应该做什么"></textarea></label>
+              <section class="scheduled-settings-section"><h2>详情</h2><div class="scheduled-setting-card">
+                <div class="scheduled-setting-row"><span id="scheduled-run-task-label">运行任务</span><div class="scheduled-custom-select" data-scheduled-select="run-task" data-dropdown-boundary data-value="">
+                  <button class="scheduled-select-trigger" type="button" data-action="toggle-scheduled-select" data-testid="scheduled-run-task-trigger" aria-labelledby="scheduled-run-task-label scheduled-run-task-value" aria-haspopup="listbox" aria-expanded="false"><span id="scheduled-run-task-value" data-scheduled-select-value>选择任务</span><i aria-hidden="true"></i></button>
+                  <div class="scheduled-select-menu" data-testid="scheduled-run-task-menu" role="listbox" aria-labelledby="scheduled-run-task-label" hidden><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="" aria-selected="true">选择任务</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="营销文案策划" aria-selected="false">营销文案策划</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="品牌视觉助手" aria-selected="false">品牌视觉助手</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="UI 动效导演" aria-selected="false">UI 动效导演</button></div>
+                </div></div>
+                <div class="scheduled-setting-row"><span id="scheduled-run-directory-label">运行于</span><div class="scheduled-custom-select" data-scheduled-select="run-directory" data-dropdown-boundary data-value="">
+                  <button class="scheduled-select-trigger" type="button" data-action="toggle-scheduled-select" data-testid="scheduled-run-directory-trigger" aria-labelledby="scheduled-run-directory-label scheduled-run-directory-value" aria-haspopup="listbox" aria-expanded="false"><span id="scheduled-run-directory-value" data-scheduled-select-value>选择目录</span><i aria-hidden="true"></i></button>
+                  <div class="scheduled-select-menu" data-testid="scheduled-run-directory-menu" role="listbox" aria-labelledby="scheduled-run-directory-label" hidden><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="" aria-selected="true">选择目录</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="project-guide" aria-selected="false">项目新手指引</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="unbound-project" aria-selected="false">未分类项目</button></div>
+                </div></div>
+              </div></section>
+              <section class="scheduled-settings-section"><h2>频率</h2><div class="scheduled-setting-card">
+                <div class="scheduled-setting-row"><span id="scheduled-repeat-label">重复</span><div class="scheduled-custom-select" data-scheduled-select="repeat" data-dropdown-boundary data-value="每天">
+                  <button class="scheduled-select-trigger" type="button" data-action="toggle-scheduled-select" data-testid="scheduled-repeat-trigger" aria-labelledby="scheduled-repeat-label scheduled-repeat-value" aria-haspopup="listbox" aria-expanded="false"><span id="scheduled-repeat-value" data-scheduled-select-value>每天</span><i aria-hidden="true"></i></button>
+                  <div class="scheduled-select-menu" data-testid="scheduled-repeat-menu" role="listbox" aria-labelledby="scheduled-repeat-label" hidden><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="稍后安排" aria-selected="false">稍后安排</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="每天" aria-selected="true">每天</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="工作日" aria-selected="false">工作日</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="每周" aria-selected="false">每周</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="自定义" aria-selected="false">自定义</button></div>
+                </div></div>
+                <div class="scheduled-setting-row scheduled-time-row"><span>时间</span><div class="scheduled-time-control" data-dropdown-boundary><div class="scheduled-time-input-row"><div class="scheduled-time-fields"><input type="text" inputmode="numeric" autocomplete="off" aria-label="小时" aria-describedby="scheduled-time-hour-error" aria-invalid="false" data-testid="scheduled-time-hour" value="09" maxlength="2"><span class="scheduled-time-separator" aria-hidden="true">:</span><input type="text" inputmode="numeric" autocomplete="off" aria-label="分钟" aria-describedby="scheduled-time-minute-error" aria-invalid="false" data-testid="scheduled-time-minute" value="00" maxlength="2"></div><button class="scheduled-time-trigger" type="button" data-action="toggle-scheduled-time-picker" data-testid="scheduled-time-trigger" aria-label="选择时间" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v5l3.5 2"/></svg></button></div><div class="scheduled-time-errors" aria-live="polite"><small id="scheduled-time-hour-error" data-testid="scheduled-time-hour-error" hidden></small><small id="scheduled-time-minute-error" data-testid="scheduled-time-minute-error" hidden></small></div><div class="scheduled-time-picker" data-testid="scheduled-time-picker" role="dialog" aria-label="时间选择器" hidden><section><strong>小时</strong><div class="scheduled-time-options" data-scheduled-time-hours role="listbox" aria-label="小时"></div></section><section><strong>分钟</strong><div class="scheduled-time-options" data-scheduled-time-minutes role="listbox" aria-label="分钟"></div></section></div></div></div>
+                <div class="scheduled-setting-row"><span id="scheduled-notification-label">通知</span><div class="scheduled-custom-select" data-scheduled-select="notification" data-dropdown-boundary data-value="重要更新">
+                  <button class="scheduled-select-trigger" type="button" data-action="toggle-scheduled-select" data-testid="scheduled-notification-trigger" aria-labelledby="scheduled-notification-label scheduled-notification-value" aria-haspopup="listbox" aria-expanded="false"><span id="scheduled-notification-value" data-scheduled-select-value>重要更新</span><i aria-hidden="true"></i></button>
+                  <div class="scheduled-select-menu" data-testid="scheduled-notification-menu" role="listbox" aria-labelledby="scheduled-notification-label" hidden><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="重要更新" aria-selected="true">重要更新</button><button type="button" role="option" data-action="select-scheduled-option" data-scheduled-option="仅限未成功运行" aria-selected="false">仅限未成功运行</button></div>
+                </div></div>
+              </div></section>
+            </div>
+            <footer><button class="scheduled-save-button" type="button" data-action="save-scheduled-task" data-testid="scheduled-save-button">创建</button></footer>
+          </aside>
+        </section>
+
+        <div class="dialog-backdrop" data-testid="knowledge-dialog" hidden>
+          <section class="knowledge-action-dialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-dialog-title">
+            <header><div><h2 id="knowledge-dialog-title" data-knowledge-dialog-title>新建文件夹</h2><p data-knowledge-dialog-subtitle hidden></p></div><button type="button" data-action="close-knowledge-dialog" aria-label="关闭资料库弹窗">×</button></header>
+            <div data-knowledge-folder-form>
+              <label><span data-knowledge-dialog-label>文件夹名称</span><input type="text" data-testid="knowledge-dialog-input" placeholder="请输入名称"></label>
+              <p data-knowledge-dialog-note>新内容会保存在当前知识空间中。</p>
+              <footer><button type="button" data-action="close-knowledge-dialog">取消</button><button class="primary" type="button" data-action="submit-knowledge-dialog" data-testid="knowledge-dialog-submit">创建</button></footer>
+            </div>
+            <div class="knowledge-source-chooser" data-knowledge-content-chooser hidden>
+              <div class="knowledge-source-grid">
+                <button type="button" data-action="knowledge-upload-local"><strong>上传本地文件</strong><span>PDF、Word、TXT、<br>Markdown</span></button>
+                <button type="button" data-action="knowledge-online-platform" hidden><strong>从在线平台选择</strong><span>飞书、WPS、钉钉、企<br>业微信</span></button>
+                <button type="button" data-action="knowledge-online-link"><strong>粘贴在线链接</strong><span>自动识别平台并检查访<br>问方式</span></button>
+              </div>
+              <input type="file" multiple accept=".pdf,.doc,.docx,.txt,.md,.markdown" data-testid="knowledge-local-file-input" hidden>
+              <p>导入前请确认你拥有相应内容的访问权限。</p>
+            </div>
+            <div class="knowledge-online-form" data-knowledge-online-form hidden>
+              <label class="knowledge-online-field"><span>文档链接</span><input type="url" inputmode="url" autocomplete="url" aria-label="文档链接" aria-describedby="knowledge-online-help knowledge-online-error" aria-invalid="false" data-testid="knowledge-online-url" placeholder="https://docs.example.com/customer-brief"></label>
+              <small id="knowledge-online-help" class="knowledge-online-help">系统会检查协议、重定向、内网地址、文件大小和内容类型。</small>
+              <small id="knowledge-online-error" class="knowledge-online-error" data-testid="knowledge-online-error" role="alert" hidden></small>
+              <label class="knowledge-online-field"><span>保存位置</span><select aria-label="保存位置" data-testid="knowledge-online-location"><option data-knowledge-online-location-option>当前知识空间</option></select></label>
+              <section class="knowledge-online-update-note" aria-label="更新方式"><strong>更新方式</strong><p>普通在线链接默认为单次快照；需要更新时由用户重新导入或手动刷新。</p></section>
+              <footer><button type="button" data-action="cancel-knowledge-online">取消</button><button class="primary" type="button" data-action="submit-knowledge-online" data-testid="knowledge-online-submit">验证并导入</button></footer>
+            </div>
+          </section>
+        </div>
+
+        <div class="dialog-backdrop" data-testid="knowledge-detail-dialog" hidden>
+          <section class="knowledge-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-detail-title" aria-describedby="knowledge-detail-note">
+            <header><div><span class="knowledge-detail-kicker">资料库文档 · 只读详情</span><h2 id="knowledge-detail-title" data-knowledge-detail-title></h2></div><button type="button" data-action="close-knowledge-detail" aria-label="关闭文档详情">×</button></header>
+            <dl class="knowledge-detail-fields"><div><dt>文件类型</dt><dd data-knowledge-detail-type></dd></div><div><dt>所属目录</dt><dd data-knowledge-detail-directory></dd></div><div><dt>所有者</dt><dd data-knowledge-detail-owner></dd></div><div><dt>更新时间</dt><dd data-knowledge-detail-updated></dd></div><div><dt>解析状态</dt><dd data-knowledge-detail-status></dd></div></dl>
+            <div class="knowledge-detail-summary"><h3>摘要</h3><p data-knowledge-detail-summary></p></div>
+            <p id="knowledge-detail-note" class="knowledge-detail-note">此处仅展示已有文档信息，不提供正文预览。</p>
+            <footer><button type="button" data-action="close-knowledge-detail">关闭</button></footer>
+          </section>
+        </div>
+
+        <input type="file" accept=".pdf,.doc,.docx,.txt,.md,.markdown" data-testid="knowledge-version-file-input" hidden>
+        <div class="dialog-backdrop" data-testid="knowledge-item-dialog" hidden>
+          <section class="knowledge-action-dialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-item-dialog-title">
+            <header><h2 id="knowledge-item-dialog-title" data-knowledge-item-dialog-title></h2><button type="button" data-action="close-knowledge-item-dialog" aria-label="关闭文档操作弹窗">×</button></header>
+            <label data-knowledge-item-name-field>文档名称<input type="text" data-testid="knowledge-item-name" maxlength="120"></label>
+            <label data-knowledge-item-folder-field hidden>目标文件夹<select data-testid="knowledge-item-folder" aria-label="目标文件夹"></select></label>
+            <footer><button type="button" data-action="close-knowledge-item-dialog">取消</button><button class="primary" type="button" data-action="submit-knowledge-item-dialog" data-testid="knowledge-item-submit">保存</button></footer>
+          </section>
+        </div>
+
+        <div class="dialog-backdrop" data-testid="upload-skill-dialog" hidden>
+          <section class="upload-dialog" role="dialog" aria-modal="true" aria-labelledby="upload-dialog-title">
+            <button class="dialog-close" type="button" data-action="close-upload" aria-label="关闭">×</button>
+            <h2 id="upload-dialog-title" data-skill-dialog-title>导入 Skill</h2>
+            <p data-skill-dialog-description>导入本地 Skill 配置并保存到“我的 Skill”。</p>
+            <label>Skill 名称<input type="text" aria-label="Skill 名称" data-testid="skill-name-input" placeholder="例如：品牌审校助手"></label>
+            <label>说明<textarea aria-label="Skill 说明" placeholder="简要说明适用场景"></textarea></label>
+            <section class="skill-file-section" data-skill-file-section data-testid="skill-file-transfer" aria-label="Skill 文件上传区">
+              <span class="skill-file-label">Skill 文件</span>
+              <input type="file" accept=".zip,.json,.yaml,.yml,.md" data-testid="skill-file-input" hidden>
+              <div class="skill-file-empty" data-skill-file-empty>
+                <button type="button" data-action="choose-skill-file">
+                  <svg data-icon="upload" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 15V4m0 0L8 8m4-4 4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"></path>
+                  </svg>
+                  <span>选择文件</span>
+                </button>
+                <strong data-skill-file-drag-hint>或拖拽 Skill 文件到这里</strong>
+                <small data-testid="skill-file-formats">支持 .zip、.json、.yaml、.yml、.md</small>
+              </div>
+              <div class="skill-file-selected" data-skill-file-selected data-testid="skill-file-selected" hidden>
+                <span class="skill-file-type" aria-hidden="true">SKILL</span>
+                <span class="skill-file-copy"><strong data-testid="skill-file-name"></strong><small data-testid="skill-file-size"></small></span>
+                <span class="skill-file-actions"><button type="button" data-action="choose-skill-file" data-testid="skill-file-reselect">重新选择</button><button type="button" data-action="remove-skill-file" data-testid="skill-file-remove">移除</button></span>
+              </div>
+              <small class="skill-file-error" data-skill-file-error data-testid="skill-file-error" role="alert" hidden></small>
+            </section>
+            <div class="dialog-actions"><button class="secondary-action" type="button" data-action="close-upload">取消</button><button class="primary-action" type="button" data-action="save-skill" data-testid="skill-dialog-submit">导入</button></div>
+          </section>
+        </div>
+
+        <div class="dialog-backdrop" data-testid="project-dialog" hidden>
+          <section class="project-dialog" role="dialog" aria-modal="true" aria-labelledby="project-dialog-title">
+            <button class="dialog-close" type="button" data-action="close-project-dialog" aria-label="关闭">×</button>
+            <h2 id="project-dialog-title" data-project-dialog-title>新建项目</h2>
+            <label class="project-name-field">项目名称<input type="text" aria-label="项目名称" aria-describedby="project-name-limit project-name-error" aria-errormessage="project-name-error" data-testid="project-name-input" placeholder="例如：Hengzhun 品牌方案"><small class="project-name-error" id="project-name-error" data-testid="project-name-error" role="alert" hidden>项目名称不能超出30个字符</small></label>
+            <span class="visually-hidden" id="project-name-limit">最多输入 30 个用户可见字符</span>
+            <p class="project-dialog-note" data-project-dialog-note><span aria-hidden="true">ⓘ</span><span>项目名称可在创建后继续修改</span></p>
+            <div class="project-dialog-actions"><button type="button" data-action="close-project-dialog">取消</button><button class="project-dialog-submit" type="button" data-action="submit-project" disabled>创建项目</button></div>
+          </section>
+        </div>
+
+        <div class="dialog-backdrop" data-testid="project-delete-dialog" hidden>
+          <section class="project-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="project-delete-dialog-title">
+            <button class="dialog-close" type="button" data-action="close-project-delete" aria-label="关闭">×</button>
+            <h2 id="project-delete-dialog-title">删除项目</h2>
+            <p>请选择如何处理“<strong data-project-delete-name></strong>”。</p>
+            <div class="project-delete-warning"><strong>删除项目及内容</strong><span>将同时删除该项目下的子对话、项目目录文件和素材，此操作不可撤销。</span></div>
+            <div class="project-delete-actions"><button type="button" data-action="close-project-delete">取消</button><button type="button" data-action="delete-project-folder-only">仅删除项目文件夹</button><button class="danger" type="button" data-action="delete-project-with-content">删除项目及内容</button></div>
+          </section>
+        </div>
+
+        <div class="dialog-backdrop" data-testid="asset-picker-dialog" hidden>
+          <section class="asset-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="asset-picker-title">
+            <header class="asset-picker-header">
+              <div><h2 id="asset-picker-title">从素材库选择</h2><p>选择素材库中的素材，添加到当前对话</p></div>
+              <button type="button" data-action="close-asset-picker" aria-label="关闭素材库弹窗">×</button>
+            </header>
+            <div class="asset-picker-panel" data-asset-picker-panel="assets">
+              <div class="asset-picker-toolbar">
+                <div class="asset-picker-scope-tabs" role="tablist" aria-label="素材类型">
+                  <button class="active" type="button" role="tab" aria-selected="true" data-asset-picker-scope="personal">个人素材</button>
+                  <button type="button" role="tab" aria-selected="false" data-asset-picker-scope="team">团队素材</button>
+                </div>
+                <label>所属项目<select data-testid="asset-picker-project-select" aria-label="素材所属项目"></select></label>
+              </div>
+              <div class="asset-picker-grid" data-asset-picker-assets>
+                <button type="button" data-asset-picker-item="品牌主视觉.png" data-asset-picker-item-scope="personal" data-project-id="project-guide"><span class="asset-file-preview image-preview" aria-hidden="true">PNG</span><strong>品牌主视觉.png</strong><small>图片 · 4.8 MB</small></button>
+                <button type="button" data-asset-picker-item="产品介绍视频.mp4" data-asset-picker-item-scope="personal" data-project-id="project-guide"><span class="asset-file-preview video-preview" aria-hidden="true">MP4</span><strong>产品介绍视频.mp4</strong><small>视频 · 28.4 MB</small></button>
+                <button type="button" data-asset-picker-item="品牌提示音.wav" data-asset-picker-item-scope="personal" data-project-id="project-guide"><span class="asset-file-preview audio-preview" aria-hidden="true">WAV</span><strong>品牌提示音.wav</strong><small>音频 · 2.1 MB</small></button>
+                <button type="button" data-asset-picker-item="团队活动海报.jpg" data-asset-picker-item-scope="team" hidden><span class="asset-file-preview image-preview" aria-hidden="true">JPG</span><strong>团队活动海报.jpg</strong><small>图片 · 6.2 MB</small></button>
+              </div>
+            </div>
+            <footer class="asset-picker-footer"><span data-asset-picker-selection>尚未选择素材</span><div><button type="button" data-action="close-asset-picker">取消</button><button class="asset-picker-confirm" type="button" data-action="confirm-asset-picker" disabled>添加所选素材</button></div></footer>
+          </section>
+        </div>
+
+        <div class="dialog-backdrop" data-testid="knowledge-picker-dialog" hidden>
+          <section class="asset-picker-dialog knowledge-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="knowledge-picker-title">
+            <header class="asset-picker-header">
+              <div><h2 id="knowledge-picker-title">从资料库选择</h2><p>选择资料库文档，添加到当前对话</p></div>
+              <button type="button" data-action="close-knowledge-picker" aria-label="关闭资料库选择弹窗">×</button>
+            </header>
+            <div class="knowledge-picker-toolbar">
+              <div class="asset-picker-scope-tabs" role="tablist" aria-label="资料库空间">
+                <button class="active" type="button" role="tab" aria-selected="true" data-action="select-knowledge-picker-space" data-knowledge-picker-space="public">项目公共空间</button>
+                <button type="button" role="tab" aria-selected="false" data-action="select-knowledge-picker-space" data-knowledge-picker-space="private">我的个人空间</button>
+              </div>
+            </div>
+            <div class="asset-picker-panel knowledge-picker-list" data-knowledge-picker-list></div>
+            <footer class="asset-picker-footer"><span data-testid="knowledge-picker-selection">尚未选择文档</span><div><button type="button" data-action="close-knowledge-picker">取消</button><button class="asset-picker-confirm" type="button" data-action="confirm-knowledge-picker" disabled>添加所选文档</button></div></footer>
+          </section>
+        </div>
+
+        <div class="command-menu" id="composer-command-menu" data-testid="command-menu" data-dropdown-boundary role="listbox" aria-label="输入指令" hidden></div>
+        <div class="toast" data-testid="toast" role="status" aria-live="polite" hidden></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="knowledge-prototype-bridge.js"></script>
+  <script src="script-library.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
