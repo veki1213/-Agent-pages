@@ -1288,6 +1288,14 @@
     return state.homeComposerTextSlots.filter((text) => text.trim()).join(' ').trim();
   }
 
+  function syncHomeComposerHeight() {
+    const composer = $('[data-testid="composer"]');
+    const row = composer?.querySelector('.composer-input-row');
+    if (!composer || !row) return;
+    const hasText = state.homeComposerTextSlots.some((value) => Boolean(value?.trim()));
+    composer.classList.toggle('is-expanded', hasText && row.scrollHeight > 96);
+  }
+
   function renderHomeComposerTextFlow() {
     const row = $('[data-testid="composer"] .composer-input-row');
     const input = $('[data-testid="prompt-input"]');
@@ -1307,7 +1315,14 @@
       : items.length;
     const inline = items.length > 0;
     const hasEarlierText = state.homeComposerTextSlots.some((value, index) => index < items.length && Boolean(value?.trim()));
-    const prefixFlow = inline && slot === items.length && !hasEarlierText && Boolean(state.homeComposerTextSlots[slot]?.trim());
+    // With one newly selected module, the trailing slot is the single shared
+    // prompt even when empty. Keeping an extra empty leading slot would split
+    // the placeholder around that module. Multiple modules retain their empty
+    // slots so text can still be inserted between them.
+    const prefixFlow = inline
+      && slot === items.length
+      && !hasEarlierText
+      && (items.length === 1 || Boolean(state.homeComposerTextSlots[slot]?.trim()));
     if (prefixFlow) row.dataset.moduleTextFlow = 'prefix';
     else if (inline) row.dataset.moduleTextFlow = 'inline';
     else delete row.dataset.moduleTextFlow;
@@ -1333,14 +1348,16 @@
         textSlot.setAttribute('aria-label', `第${index + 1}段创作文字`);
         textSlot.dataset.placeholder = '输入文字';
         textSlot.textContent = value || '';
-        textSlot.style.order = String(index * 2);
+        // Modules lead their corresponding text segment in the visual flow.
+        textSlot.style.order = String(index * 2 + 1);
         row.append(textSlot);
       });
     }
-    input.style.order = prefixFlow ? String(items.length) : inline ? String(slot * 2) : '';
+    input.style.order = prefixFlow ? String(items.length) : inline ? String(slot * 2 + 1) : '';
     items.forEach((item, index) => {
-      item.style.order = prefixFlow ? String(index) : inline ? String(index * 2 + 1) : '';
+      item.style.order = prefixFlow ? String(index) : inline ? String(index * 2) : '';
     });
+    syncHomeComposerHeight();
   }
 
   function activateHomeComposerTextSlot(index) {
@@ -1498,7 +1515,7 @@
     $$('[data-composer-module]').forEach((module) => {
       module.classList.remove('is-dragging', 'is-drop-before', 'is-drop-after');
     });
-    $$('[data-composer-text-slot]').forEach((textSlot) => textSlot.classList.remove('is-drop-target'));
+    $$('[data-composer-text-slot], textarea[data-module-text-slot]').forEach((textSlot) => textSlot.classList.remove('is-drop-target'));
     $$('.composer-modules').forEach((container) => {
       container.classList.remove('is-drop-at-start', 'is-drop-at-end');
     });
@@ -5549,6 +5566,7 @@
   document.addEventListener('dragover', (event) => {
     const target = event.target.closest?.('[data-composer-module]');
     const textSlot = event.target.closest?.('[data-composer-text-slot]');
+    const textInput = event.target.closest?.('textarea[data-module-text-slot]');
     const inputRow = event.target.closest?.('.composer-input-row, .conversation-composer-input-row');
     if (!state.draggedComposerModuleId) return;
     if (textSlot) {
@@ -5556,7 +5574,7 @@
       event.dataTransfer.dropEffect = 'move';
       $$('[data-composer-module]').forEach((module) => module.classList.remove('is-drop-before', 'is-drop-after'));
       $$('.composer-modules').forEach((container) => container.classList.remove('is-drop-at-start', 'is-drop-at-end'));
-      $$('[data-composer-text-slot]').forEach((slot) => slot.classList.remove('is-drop-target'));
+      $$('[data-composer-text-slot], textarea[data-module-text-slot]').forEach((slot) => slot.classList.remove('is-drop-target'));
       state.composerModuleDropId = null;
       state.composerModuleDropAfter = false;
       state.composerModuleDropTextSlot = {
@@ -5564,6 +5582,24 @@
         index: Number(textSlot.dataset.composerTextSlot)
       };
       textSlot.classList.add('is-drop-target');
+      return;
+    }
+    if (textInput && inputRow) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      $$('[data-composer-module]').forEach((module) => module.classList.remove('is-drop-before', 'is-drop-after'));
+      $$('.composer-modules').forEach((container) => container.classList.remove('is-drop-at-start', 'is-drop-at-end'));
+      $$('[data-composer-text-slot], textarea[data-module-text-slot]').forEach((slot) => slot.classList.remove('is-drop-target'));
+      const box = textInput.getBoundingClientRect();
+      const surface = inputRow.classList.contains('conversation-composer-input-row') ? 'conversation' : 'home';
+      const activeSlot = Number(textInput.dataset.moduleTextSlot);
+      state.composerModuleDropId = null;
+      state.composerModuleDropAfter = false;
+      state.composerModuleDropTextSlot = {
+        surface,
+        index: event.clientX >= box.left + box.width / 2 ? activeSlot : 0
+      };
+      textInput.classList.add('is-drop-target');
       return;
     }
     if (!target && inputRow) {
@@ -5594,6 +5630,7 @@
   document.addEventListener('drop', (event) => {
     const target = event.target.closest?.('[data-composer-module]');
     const textSlot = event.target.closest?.('[data-composer-text-slot]');
+    const textInput = event.target.closest?.('textarea[data-module-text-slot]');
     const inputRow = event.target.closest?.('.composer-input-row, .conversation-composer-input-row');
     const isEdgeDrop = !target && Boolean(inputRow);
     if (!state.draggedComposerModuleId || (!target && !isEdgeDrop)) return;
@@ -5604,7 +5641,7 @@
     const targetId = target ? state.composerModuleDropId : null;
     const placeAfter = state.composerModuleDropAfter;
     clearComposerModuleDragState();
-    if (textSlot && textSlotDrop) {
+    if (textSlotDrop && inputRow) {
       moveComposerModuleToTextSlot(sourceId, textSlotDrop.surface, textSlotDrop.index);
       return;
     }
